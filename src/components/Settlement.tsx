@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import type { Expense, Participant } from '../types';
 import { calculateSettlement } from '../utils/settlement';
 import { formatCurrency, convertJPYToTWD } from '../utils/currency';
@@ -6,12 +6,14 @@ import { formatCurrency, convertJPYToTWD } from '../utils/currency';
 interface SettlementProps {
   expenses: Expense[];
   participants: Participant[];
-  displayCurrency: 'JPY' | 'TWD';
   exchangeRate: number;
 }
 
-export default function Settlement({ expenses, participants, displayCurrency, exchangeRate }: SettlementProps) {
-  const { balances, settlements } = useMemo(
+export default function Settlement({ expenses, participants, exchangeRate }: SettlementProps) {
+  // 結算頁面預設顯示台幣
+  const [settlementCurrency, setSettlementCurrency] = useState<'JPY' | 'TWD'>('TWD');
+
+  const { settlements } = useMemo(
     () => calculateSettlement(expenses, participants),
     [expenses, participants]
   );
@@ -21,8 +23,8 @@ export default function Settlement({ expenses, participants, displayCurrency, ex
   };
 
   const displayAmount = (amount: number) => {
-    const finalAmount = displayCurrency === 'TWD' ? convertJPYToTWD(amount, exchangeRate) : amount;
-    return formatCurrency(finalAmount, displayCurrency);
+    const finalAmount = settlementCurrency === 'TWD' ? convertJPYToTWD(amount, exchangeRate) : amount;
+    return formatCurrency(finalAmount, settlementCurrency);
   };
 
   const totalExpense = expenses.reduce((sum, exp) => sum + exp.amount, 0);
@@ -52,32 +54,30 @@ export default function Settlement({ expenses, participants, displayCurrency, ex
         <div className="total-amount">{displayAmount(totalExpense)}</div>
       </div>
 
-      <div className="balances-section">
-        <h3>個人餘額</h3>
-        <div className="balances-grid">
-          {balances.map(b => (
-            <div key={b.participantId} className={`balance-card ${b.balance > 0 ? 'positive' : b.balance < 0 ? 'negative' : 'neutral'}`}>
-              <div className="balance-name">{getParticipantName(b.participantId)}</div>
-              <div className="balance-amount">
-                {b.balance > 0 ? '應收 ' : b.balance < 0 ? '應付 ' : ''}
-                {displayAmount(Math.abs(b.balance))}
-              </div>
-            </div>
-          ))}
-        </div>
-        <div className="balance-hint">
-          <small>正數表示應收款，負數表示應付款</small>
-        </div>
-      </div>
-
       <div className="settlements-section">
         <div className="section-header">
           <h3>結算方案</h3>
-          {settlements.length > 0 && (
-            <button className="btn-small" onClick={handleCopySettlement}>
-              📋 複製
-            </button>
-          )}
+          <div className="section-actions">
+            <div className="currency-toggle">
+              <button
+                className={`toggle-btn ${settlementCurrency === 'TWD' ? 'active' : ''}`}
+                onClick={() => setSettlementCurrency('TWD')}
+              >
+                TWD
+              </button>
+              <button
+                className={`toggle-btn ${settlementCurrency === 'JPY' ? 'active' : ''}`}
+                onClick={() => setSettlementCurrency('JPY')}
+              >
+                JPY
+              </button>
+            </div>
+            {settlements.length > 0 && (
+              <button className="btn-small" onClick={handleCopySettlement}>
+                複製
+              </button>
+            )}
+          </div>
         </div>
 
         {settlements.length === 0 ? (

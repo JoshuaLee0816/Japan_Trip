@@ -185,7 +185,6 @@ function App() {
             <Settlement
               expenses={expenses}
               participants={trip.participants}
-              displayCurrency={trip.displayCurrency}
               exchangeRate={trip.exchangeRate}
             />
           </div>
