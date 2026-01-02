@@ -63,9 +63,17 @@ export async function updateTrip(tripId: string, updates: Partial<Trip>): Promis
 
 export function subscribeTripChanges(tripId: string, callback: (trip: Trip | null) => void): Unsubscribe {
   const docRef = doc(db, 'trips', tripId);
-  return onSnapshot(docRef, (doc) => {
-    callback(doc.exists() ? (doc.data() as Trip) : null);
-  });
+  return onSnapshot(docRef,
+    (doc) => {
+      const trip = doc.exists() ? (doc.data() as Trip) : null;
+      callback(trip);
+      console.log(`[Firestore] Trip updated:`, trip?.name || 'null');
+    },
+    (error) => {
+      console.error('[Firestore] Error subscribing to trip:', error);
+      callback(null);
+    }
+  );
 }
 
 // ==================== 費用相關 ====================
@@ -96,13 +104,21 @@ export function subscribeExpenses(tripId: string, callback: (expenses: Expense[]
   const q = query(
     collection(db, 'expenses'),
     where('tripId', '==', tripId),
-    orderBy('date', 'desc')
+    orderBy('createdAt', 'desc')
   );
 
-  return onSnapshot(q, (snapshot) => {
-    const expenses = snapshot.docs.map(doc => doc.data() as Expense);
-    callback(expenses);
-  });
+  return onSnapshot(q,
+    (snapshot) => {
+      const expenses = snapshot.docs.map(doc => doc.data() as Expense);
+      callback(expenses);
+      console.log(`[Firestore] Expenses updated: ${expenses.length} expenses`);
+    },
+    (error) => {
+      console.error('[Firestore] Error subscribing to expenses:', error);
+      // Return empty array on error to prevent app crash
+      callback([]);
+    }
+  );
 }
 
 // ==================== 行程相關 ====================
