@@ -8,7 +8,6 @@ import {
   where,
   onSnapshot,
   deleteDoc,
-  orderBy,
   type Unsubscribe,
 } from 'firebase/firestore';
 import { db } from './firebase';
@@ -101,20 +100,29 @@ export async function deleteExpense(expenseId: string): Promise<void> {
 }
 
 export function subscribeExpenses(tripId: string, callback: (expenses: Expense[]) => void): Unsubscribe {
+  // 暫時移除 orderBy 來避免需要複合索引
+  // 改在前端排序
   const q = query(
     collection(db, 'expenses'),
-    where('tripId', '==', tripId),
-    orderBy('createdAt', 'desc')
+    where('tripId', '==', tripId)
   );
 
   return onSnapshot(q,
     (snapshot) => {
-      const expenses = snapshot.docs.map(doc => doc.data() as Expense);
+      // 在前端排序資料
+      const expenses = snapshot.docs
+        .map(doc => doc.data() as Expense)
+        .sort((a, b) => {
+          // 依照 createdAt 降序排列(最新的在前面)
+          return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+        });
+
       callback(expenses);
       console.log(`[Firestore] Expenses updated: ${expenses.length} expenses`);
     },
     (error) => {
       console.error('[Firestore] Error subscribing to expenses:', error);
+      console.error('[Firestore] Error details:', error.code, error.message);
       // Return empty array on error to prevent app crash
       callback([]);
     }
@@ -146,16 +154,26 @@ export async function deleteItineraryDay(dayId: string): Promise<void> {
 }
 
 export function subscribeItineraryDays(tripId: string, callback: (days: ItineraryDay[]) => void): Unsubscribe {
+  // 暫時移除 orderBy 來避免需要複合索引
   const q = query(
     collection(db, 'itinerary_days'),
-    where('tripId', '==', tripId),
-    orderBy('dayNumber', 'asc')
+    where('tripId', '==', tripId)
   );
 
-  return onSnapshot(q, (snapshot) => {
-    const days = snapshot.docs.map(doc => doc.data() as ItineraryDay);
-    callback(days);
-  });
+  return onSnapshot(q,
+    (snapshot) => {
+      // 在前端排序資料
+      const days = snapshot.docs
+        .map(doc => doc.data() as ItineraryDay)
+        .sort((a, b) => a.dayNumber - b.dayNumber);
+      callback(days);
+    },
+    (error) => {
+      console.error('[Firestore] Error subscribing to itinerary days:', error);
+      console.error('[Firestore] Error details:', error.code, error.message);
+      callback([]);
+    }
+  );
 }
 
 export async function addItineraryItem(item: Omit<ItineraryItem, 'id' | 'createdAt' | 'updatedAt'>): Promise<ItineraryItem> {
@@ -181,16 +199,26 @@ export async function deleteItineraryItem(itemId: string): Promise<void> {
 }
 
 export function subscribeItineraryItems(tripId: string, callback: (items: ItineraryItem[]) => void): Unsubscribe {
+  // 暫時移除 orderBy 來避免需要複合索引
   const q = query(
     collection(db, 'itinerary_items'),
-    where('tripId', '==', tripId),
-    orderBy('order', 'asc')
+    where('tripId', '==', tripId)
   );
 
-  return onSnapshot(q, (snapshot) => {
-    const items = snapshot.docs.map(doc => doc.data() as ItineraryItem);
-    callback(items);
-  });
+  return onSnapshot(q,
+    (snapshot) => {
+      // 在前端排序資料
+      const items = snapshot.docs
+        .map(doc => doc.data() as ItineraryItem)
+        .sort((a, b) => a.order - b.order);
+      callback(items);
+    },
+    (error) => {
+      console.error('[Firestore] Error subscribing to itinerary items:', error);
+      console.error('[Firestore] Error details:', error.code, error.message);
+      callback([]);
+    }
+  );
 }
 
 // ==================== 匯出/匯入 ====================
