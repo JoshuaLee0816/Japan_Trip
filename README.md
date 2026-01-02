@@ -13,9 +13,10 @@ A Progressive Web Application for tracking shared expenses during group travel i
 - Categorized expenses (meals, transportation, accommodation, shopping, etc.)
 
 ### Automatic Settlement
-- Calculates individual balances automatically
 - Generates optimal settlement suggestions with minimum transactions
+- Default display in TWD with quick toggle to JPY
 - Clear visualization of who owes whom
+- One-click copy settlement plan
 
 ### Itinerary Planning
 - Day-by-day trip planning
@@ -168,8 +169,9 @@ service cloud.firestore {
 ### Viewing Settlement
 
 1. Navigate to "Settlement" tab
-2. View individual balances (positive = should receive, negative = should pay)
-3. View settlement suggestions for optimal payment flow
+2. View settlement suggestions for optimal payment flow
+3. Toggle between TWD and JPY display
+4. Click "Copy" to copy settlement plan to clipboard
 
 ### Planning Itinerary
 
