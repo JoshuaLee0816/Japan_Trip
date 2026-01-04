@@ -1076,7 +1076,7 @@ input:disabled, select:disabled, textarea:disabled {
   display: flex;
   gap: 1rem;
   padding: 0.5rem 0;
-  margin-left: 3.75rem;
+  margin-left: 60px;
   position: relative;
 }
 
@@ -1097,7 +1097,8 @@ input:disabled, select:disabled, textarea:disabled {
 .transport-line::before {
   content: '';
   position: absolute;
-  left: 5px;
+  left: 50%;
+  transform: translateX(-50%);
   top: 0;
   bottom: 0;
   width: 2px;
@@ -1156,8 +1157,9 @@ input:disabled, select:disabled, textarea:disabled {
   border-radius: 0.5rem;         /* Slightly smaller border-radius */
 
   /* Position based on timeline center variable */
+  /* 右邊界對齊藍色虛線 */
   position: absolute;
-  right: 215px;
+  right: calc(100% - var(--timeline-center-x) + 5rem);
   top: 0.5rem;
   z-index: 1;
   white-space: nowrap;
