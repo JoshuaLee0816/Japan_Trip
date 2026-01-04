@@ -39,8 +39,8 @@
   --settlement-total-font-size: 2.5rem;
 
   /* Timeline positioning - single source of truth */
-  --timeline-center-x: 23.8%;         /* Center position of timeline dashed line */
-  --transport-offset-left: 35px;     /* Transport badge offset from timeline center (to the left) */
+  --timeline-center-x: 65px;         /* Center position of timeline dashed line (fixed pixel) */
+  --transport-badge-gap: 6rem;     /* Gap between transport badge right edge and timeline */
 }
 
 * {
@@ -1157,9 +1157,9 @@ input:disabled, select:disabled, textarea:disabled {
   border-radius: 0.5rem;         /* Slightly smaller border-radius */
 
   /* Position based on timeline center variable */
-  /* 右邊界對齊藍色虛線 */
+  /* 右邊界對齊藍色虛線左側固定距離 */
   position: absolute;
-  right: calc(100% - var(--timeline-center-x) + 5rem);
+  right: calc(100% - var(--timeline-center-x) + var(--transport-badge-gap));
   top: 0.5rem;
   z-index: 1;
   white-space: nowrap;
