@@ -39,7 +39,7 @@
   --settlement-total-font-size: 2.5rem;
 
   /* Timeline positioning - single source of truth */
-  --timeline-center-x: 65px;         /* Center position of timeline dashed line */
+  --timeline-center-x: 23.8%;         /* Center position of timeline dashed line */
   --transport-offset-left: 35px;     /* Transport badge offset from timeline center (to the left) */
 }
 
@@ -1076,7 +1076,7 @@ input:disabled, select:disabled, textarea:disabled {
   display: flex;
   gap: 1rem;
   padding: 0.5rem 0;
-  margin-left: 60px;
+  margin-left: 3.75rem;
   position: relative;
 }
 
