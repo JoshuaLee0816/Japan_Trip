@@ -4,6 +4,12 @@ import { VitePWA } from 'vite-plugin-pwa'
 
 // https://vite.dev/config/
 export default defineConfig({
+  base: '/Japan_Trip/',
+  server: {
+    host: '0.0.0.0', // 允許外部存取
+    port: 5173,
+    strictPort: true,
+  },
   plugins: [
     react(),
     VitePWA({
@@ -17,8 +23,8 @@ export default defineConfig({
         background_color: '#ffffff',
         display: 'standalone',
         orientation: 'portrait',
-        scope: '/',
-        start_url: '/',
+        scope: '/Japan_Trip/',
+        start_url: '/Japan_Trip/',
         icons: [
           {
             src: '/icons/icon-72x72.svg',

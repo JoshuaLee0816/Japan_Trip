@@ -9,15 +9,16 @@ import TripSetup from './components/TripSetup';
 import ExpenseList from './components/ExpenseList';
 import Settlement from './components/Settlement';
 import Itinerary from './components/Itinerary';
+import ShoppingList from './components/ShoppingList';
 import './App.css';
 
-type Tab = 'expenses' | 'settlement' | 'itinerary';
+type Tab = 'expenses' | 'settlement' | 'itinerary' | 'shopping';
 
 function App() {
   const [currentTripId, setCurrentTripId] = useState<string | null>(null);
   const [trip, setTrip] = useState<Trip | null>(null);
   const [expenses, setExpenses] = useState<Expense[]>([]);
-  const [activeTab, setActiveTab] = useState<Tab>('expenses');
+  const [activeTab, setActiveTab] = useState<Tab>('itinerary');
   const [showSettings, setShowSettings] = useState(false);
 
   // 載入已儲存的旅程
@@ -51,14 +52,6 @@ function App() {
     localStorage.setItem('currentTripId', tripId);
   };
 
-  const handleLeaveTrip = () => {
-    if (confirm('確定要離開此旅程？')) {
-      localStorage.removeItem('currentTripId');
-      setCurrentTripId(null);
-      setTrip(null);
-      setExpenses([]);
-    }
-  };
 
   const handleUpdateParticipantName = async (participantId: string, newName: string) => {
     if (!trip) return;
@@ -81,6 +74,14 @@ function App() {
     await updateTrip(trip.id, { displayCurrency: newCurrency });
   };
 
+  const handleBackToHome = () => {
+    // 清除當前旅程
+    localStorage.removeItem('currentTripId');
+    setCurrentTripId(null);
+    setTrip(null);
+    setExpenses([]);
+  };
+
   // 如果尚未加入旅程，顯示設定頁面
   if (!currentTripId || !trip) {
     return <TripSetup onTripJoined={handleTripJoined} />;
@@ -92,11 +93,11 @@ function App() {
         <div className="header-top">
           <h1>{trip.name}</h1>
           <div className="header-actions">
+            <button className="btn-icon" onClick={handleBackToHome} title="返回首頁">
+              🏠
+            </button>
             <button className="btn-icon" onClick={() => setShowSettings(!showSettings)} title="設定">
               ⚙️
-            </button>
-            <button className="btn-icon" onClick={handleLeaveTrip} title="離開旅程">
-              🚪
             </button>
           </div>
         </div>
@@ -145,27 +146,45 @@ function App() {
 
         <nav className="tab-nav">
           <button
+            className={`tab-button ${activeTab === 'itinerary' ? 'active' : ''}`}
+            onClick={() => setActiveTab('itinerary')}
+          >
+            行程
+          </button>
+          <button
+            className={`tab-button ${activeTab === 'shopping' ? 'active' : ''}`}
+            onClick={() => setActiveTab('shopping')}
+          >
+            購物
+          </button>
+          <button
             className={`tab-button ${activeTab === 'expenses' ? 'active' : ''}`}
             onClick={() => setActiveTab('expenses')}
           >
-            💰 費用
+            費用
           </button>
           <button
             className={`tab-button ${activeTab === 'settlement' ? 'active' : ''}`}
             onClick={() => setActiveTab('settlement')}
           >
-            🧮 結算
-          </button>
-          <button
-            className={`tab-button ${activeTab === 'itinerary' ? 'active' : ''}`}
-            onClick={() => setActiveTab('itinerary')}
-          >
-            📅 行程
+            結算
           </button>
         </nav>
       </header>
 
       <main className="app-main">
+        {activeTab === 'itinerary' && (
+          <div className="tab-content">
+            <Itinerary tripId={trip.id} />
+          </div>
+        )}
+
+        {activeTab === 'shopping' && (
+          <div className="tab-content">
+            <ShoppingList tripId={trip.id} participants={trip.participants} />
+          </div>
+        )}
+
         {activeTab === 'expenses' && (
           <div className="tab-content">
             <ExpenseList
@@ -187,12 +206,6 @@ function App() {
               participants={trip.participants}
               exchangeRate={trip.exchangeRate}
             />
-          </div>
-        )}
-
-        {activeTab === 'itinerary' && (
-          <div className="tab-content">
-            <Itinerary tripId={trip.id} />
           </div>
         )}
       </main>

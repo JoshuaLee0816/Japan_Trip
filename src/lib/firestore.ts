@@ -8,10 +8,12 @@ import {
   where,
   onSnapshot,
   deleteDoc,
+  orderBy,
+  limit,
   type Unsubscribe,
 } from 'firebase/firestore';
 import { db } from './firebase';
-import type { Trip, Expense, ItineraryDay, ItineraryItem, Participant } from '../types';
+import type { Trip, Expense, ItineraryDay, ItineraryItem, Participant, ShoppingItem } from '../types';
 import { generateRoomCode } from '../utils/roomCode';
 
 // ==================== 旅程相關 ====================
@@ -73,6 +75,44 @@ export function subscribeTripChanges(tripId: string, callback: (trip: Trip | nul
       callback(null);
     }
   );
+}
+
+export async function getRecentTrips(limitCount = 10): Promise<Trip[]> {
+  const q = query(
+    collection(db, 'trips'),
+    orderBy('createdAt', 'desc'),
+    limit(limitCount)
+  );
+
+  const snapshot = await getDocs(q);
+  return snapshot.docs.map(doc => doc.data() as Trip);
+}
+
+export async function deleteTrip(tripId: string): Promise<void> {
+  // 刪除旅程相關的所有資料
+
+  // 刪除費用
+  const expensesQuery = query(collection(db, 'expenses'), where('tripId', '==', tripId));
+  const expensesSnapshot = await getDocs(expensesQuery);
+  await Promise.all(expensesSnapshot.docs.map(doc => deleteDoc(doc.ref)));
+
+  // 刪除行程項目
+  const itemsQuery = query(collection(db, 'itinerary_items'), where('tripId', '==', tripId));
+  const itemsSnapshot = await getDocs(itemsQuery);
+  await Promise.all(itemsSnapshot.docs.map(doc => deleteDoc(doc.ref)));
+
+  // 刪除行程天數
+  const daysQuery = query(collection(db, 'itinerary_days'), where('tripId', '==', tripId));
+  const daysSnapshot = await getDocs(daysQuery);
+  await Promise.all(daysSnapshot.docs.map(doc => deleteDoc(doc.ref)));
+
+  // 刪除購物清單
+  const shoppingQuery = query(collection(db, 'shopping_items'), where('tripId', '==', tripId));
+  const shoppingSnapshot = await getDocs(shoppingQuery);
+  await Promise.all(shoppingSnapshot.docs.map(doc => deleteDoc(doc.ref)));
+
+  // 最後刪除旅程本身
+  await deleteDoc(doc(db, 'trips', tripId));
 }
 
 // ==================== 費用相關 ====================
@@ -264,4 +304,38 @@ export async function importTripData(data: ExportData): Promise<string> {
   await Promise.all(items.map(item => setDoc(doc(db, 'itinerary_items', item.id), item)));
 
   return trip.id;
+}
+
+// ==================== 購物清單相關 ====================
+
+export async function addShoppingItem(data: Omit<ShoppingItem, 'id' | 'createdAt' | 'updatedAt'>): Promise<void> {
+  const id = `shopping_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+  const now = new Date().toISOString();
+
+  const shoppingItem: ShoppingItem = {
+    ...data,
+    id,
+    isPurchased: false,
+    createdAt: now,
+    updatedAt: now,
+  };
+
+  await setDoc(doc(db, 'shopping_items', id), shoppingItem);
+}
+
+export async function updateShoppingItem(id: string, updates: Partial<Omit<ShoppingItem, 'id' | 'createdAt'>>): Promise<void> {
+  const itemRef = doc(db, 'shopping_items', id);
+  await setDoc(itemRef, { ...updates, updatedAt: new Date().toISOString() }, { merge: true });
+}
+
+export async function deleteShoppingItem(id: string): Promise<void> {
+  await deleteDoc(doc(db, 'shopping_items', id));
+}
+
+export function subscribeShoppingItems(tripId: string, callback: (items: ShoppingItem[]) => void): Unsubscribe {
+  const q = query(collection(db, 'shopping_items'), where('tripId', '==', tripId));
+  return onSnapshot(q, (snapshot) => {
+    const items = snapshot.docs.map(doc => doc.data() as ShoppingItem);
+    callback(items);
+  });
 }

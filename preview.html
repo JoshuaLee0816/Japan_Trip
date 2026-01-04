@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>iPhone Preview - 日本旅行記帳</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: #1a1a1a;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+      font-family: system-ui, -apple-system, sans-serif;
+    }
+
+    .device-frame {
+      background: #000;
+      border-radius: 50px;
+      padding: 15px;
+      box-shadow:
+        0 0 0 2px #2a2a2a,
+        0 0 0 4px #000,
+        0 20px 60px rgba(0,0,0,0.5);
+      position: relative;
+    }
+
+    /* iPhone 14 Pro 尺寸 */
+    .iphone-14-pro {
+      width: 393px;
+      height: 852px;
+    }
+
+    /* 瀏海 (Dynamic Island) */
+    .notch {
+      position: absolute;
+      top: 15px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 126px;
+      height: 37px;
+      background: #000;
+      border-radius: 20px;
+      z-index: 1000;
+      box-shadow: 0 0 0 2px #1a1a1a;
+    }
+
+    /* 螢幕內容 */
+    .screen {
+      width: 100%;
+      height: 100%;
+      background: white;
+      border-radius: 40px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+      display: block;
+    }
+
+    /* 裝置標籤 */
+    .device-label {
+      position: absolute;
+      top: -35px;
+      left: 50%;
+      transform: translateX(-50%);
+      color: #666;
+      font-size: 12px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      white-space: nowrap;
+    }
+
+    /* 重新載入提示 */
+    .reload-info {
+      position: absolute;
+      bottom: -50px;
+      left: 50%;
+      transform: translateX(-50%);
+      color: #888;
+      font-size: 11px;
+      text-align: center;
+      white-space: nowrap;
+    }
+
+    .reload-info .indicator {
+      display: inline-block;
+      width: 6px;
+      height: 6px;
+      background: #4ade80;
+      border-radius: 50%;
+      margin-right: 6px;
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+
+    /* 響應式調整 - 如果螢幕太小 */
+    @media (max-height: 900px) {
+      .device-frame {
+        transform: scale(0.8);
+      }
+    }
+
+    @media (max-height: 750px) {
+      .device-frame {
+        transform: scale(0.65);
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="device-frame iphone-14-pro">
+    <div class="device-label">iPhone 14 Pro - Live Preview</div>
+    <div class="notch"></div>
+    <div class="screen">
+      <iframe src="http://localhost:5173/" id="preview-frame"></iframe>
+    </div>
+    <div class="reload-info">
+      <span class="indicator"></span>
+      即時更新中 - 修改 CSS 會自動重新載入
+    </div>
+  </div>
+
+  <script>
+    const iframe = document.getElementById('preview-frame');
+
+    // 監聽來自 iframe 的訊息(Vite HMR 更新通知)
+    let lastUpdate = Date.now();
+
+    // 透過輪詢檢測 Vite 開發伺服器的更新
+    // 這會檢查主頁面是否有變化,如果有就重新載入 iframe
+    setInterval(async () => {
+      try {
+        const response = await fetch('http://localhost:5173/', {
+          method: 'HEAD',
+          cache: 'no-cache'
+        });
+        const lastModified = response.headers.get('last-modified');
+
+        if (lastModified) {
+          const modifiedTime = new Date(lastModified).getTime();
+          if (modifiedTime > lastUpdate) {
+            lastUpdate = modifiedTime;
+            // 重新載入 iframe
+            iframe.src = iframe.src;
+          }
+        }
+      } catch (e) {
+        // 如果伺服器沒有回應,確保 iframe 有 src
+        if (!iframe.src) {
+          iframe.src = 'http://localhost:5173/';
+        }
+      }
+    }, 1000);
+
+    // 鍵盤快捷鍵
+    document.addEventListener('keydown', (e) => {
+      // Cmd/Ctrl + R: 手動重新載入
+      if ((e.metaKey || e.ctrlKey) && e.key === 'r') {
+        e.preventDefault();
+        iframe.src = iframe.src;
+      }
+    });
+  </script>
+</body>
+</html>

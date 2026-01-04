@@ -23,6 +23,7 @@ export default function ExpenseList({
 }: ExpenseListProps) {
   const [editingExpense, setEditingExpense] = useState<Expense | null>(null);
   const [showForm, setShowForm] = useState(false);
+  const [isEditMode, setIsEditMode] = useState(false);
 
   const getParticipantName = (id: string) => {
     return participants.find(p => p.id === id)?.name || id;
@@ -76,9 +77,17 @@ export default function ExpenseList({
 
   return (
     <div className="expense-list">
-      <button className="btn-primary btn-add" onClick={() => setShowForm(true)}>
-        + 新增費用
-      </button>
+      <div className="tab-header">
+        <button className="btn-primary btn-add" onClick={() => setShowForm(true)}>
+          + 新增費用
+        </button>
+        <button
+          className={`btn-small ${isEditMode ? 'btn-danger' : ''}`}
+          onClick={() => setIsEditMode(!isEditMode)}
+        >
+          {isEditMode ? '完成' : '編輯'}
+        </button>
+      </div>
 
       {expenses.map(expense => {
         const splitPerPerson = expense.amount / expense.splitAmong.length;
@@ -107,14 +116,16 @@ export default function ExpenseList({
               </div>
             </div>
             {expense.note && <div className="expense-note">📌 {expense.note}</div>}
-            <div className="expense-actions">
-              <button className="btn-small" onClick={() => { setEditingExpense(expense); setShowForm(true); }}>
-                編輯
-              </button>
-              <button className="btn-small btn-danger" onClick={() => handleDelete(expense.id)}>
-                刪除
-              </button>
-            </div>
+            {isEditMode && (
+              <div className="expense-actions">
+                <button className="btn-small" onClick={() => { setEditingExpense(expense); setShowForm(true); }}>
+                  編輯
+                </button>
+                <button className="btn-small btn-danger" onClick={() => handleDelete(expense.id)}>
+                  刪除
+                </button>
+              </div>
+            )}
           </div>
         );
       })}

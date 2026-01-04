@@ -1,18 +1,46 @@
-/* 全域樣式 */
+/* 全域樣式 - 旅行主題 */
 :root {
-  --primary-color: #3b82f6;
-  --primary-hover: #2563eb;
-  --secondary-color: #6b7280;
-  --success-color: #10b981;
-  --danger-color: #ef4444;
-  --bg-color: #f9fafb;
-  --card-bg: #ffffff;
-  --border-color: #e5e7eb;
-  --text-primary: #111827;
-  --text-secondary: #6b7280;
-  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
-  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+  /* 旅行配色 */
+  --primary-color: #73B1BF;      /* 湖水藍 */
+  --primary-hover: #5A9DAD;      /* 深湖水藍 */
+  --secondary-color: #F2B680;    /* 溫暖橘 */
+  --success-color: #73B1BF;      /* 湖水藍 */
+  --danger-color: #D99873;       /* 柔和橘褐 */
+  --bg-color: #F2F2F2;           /* 淺灰背景 */
+  --card-bg: #FFFFFF;            /* 純白卡片 */
+  --border-color: #E0E0E0;       /* 淺灰邊框 */
+  --text-primary: #735755;       /* 深褐色文字 */
+  --text-secondary: #9B8886;     /* 中褐色文字 */
+
+  /* 吉卜力風格柔和陰影 */
+  --shadow-sm: 0 2px 6px 0 rgba(0, 0, 0, 0.04);
+  --shadow-md: 0 4px 12px 0 rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 8px 20px 0 rgba(0, 0, 0, 0.08);
+
+  /* 字體大小變數 - 統一在這裡控制所有字體大小! */
+  /* 基礎字體 */
+  --font-xs: 0.75rem;      /* 12px - 極小文字 */
+  --font-sm: 0.875rem;     /* 14px - 小文字 */
+  --font-base: 1rem;       /* 16px - 基礎文字 */
+  --font-lg: 1.125rem;     /* 18px - 大文字 */
+  --font-xl: 1.25rem;      /* 20px - 特大文字 */
+  --font-2xl: 1.5rem;      /* 24px - 標題 */
+  --font-3xl: 1.75rem;     /* 28px - 大標題 */
+  --font-4xl: 2rem;        /* 32px - 超大標題 */
+  --font-5xl: 2.5rem;      /* 40px - 巨大標題 */
+
+  /* 特定元件字體 */
+  --tab-button-font-size: 1rem;
+  --header-title-font-size: 1.5rem;
+  --btn-icon-font-size: 1.5rem;
+  --room-code-font-size: 1.5rem;
+  --category-emoji-font-size: 1.5rem;
+  --expense-amount-font-size: 1.25rem;
+  --settlement-total-font-size: 2.5rem;
+
+  /* Timeline positioning - single source of truth */
+  --timeline-center-x: 65px;         /* Center position of timeline dashed line */
+  --transport-offset-left: 35px;     /* Transport badge offset from timeline center (to the left) */
 }
 
 * {
@@ -78,7 +106,7 @@ body {
 }
 
 .header-top h1 {
-  font-size: 1.5rem;
+  font-size: var(--header-title-font-size);
   font-weight: 700;
 }
 
@@ -90,7 +118,7 @@ body {
 .btn-icon {
   background: transparent;
   border: none;
-  font-size: 1.5rem;
+  font-size: var(--btn-icon-font-size);
   cursor: pointer;
   padding: 0.5rem;
   border-radius: 0.5rem;
@@ -122,13 +150,13 @@ body {
 }
 
 .setting-item label {
-  font-size: 0.875rem;
+  font-size: var(--font-sm);
   font-weight: 500;
   color: var(--text-secondary);
 }
 
 .room-code {
-  font-size: 1.5rem;
+  font-size: var(--room-code-font-size);
   font-weight: 700;
   color: var(--primary-color);
   font-family: monospace;
@@ -142,7 +170,7 @@ body {
 }
 
 .participants-settings label {
-  font-size: 0.875rem;
+  font-size: var(--font-sm);
   font-weight: 500;
   color: var(--text-secondary);
 }
@@ -165,7 +193,7 @@ body {
   background: transparent;
   border: none;
   border-bottom: 2px solid transparent;
-  font-size: 1rem;
+  font-size: var(--tab-button-font-size);
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s;
@@ -208,7 +236,7 @@ body {
 
 .tab-content h2 {
   margin-bottom: 1.5rem;
-  font-size: 1.5rem;
+  font-size: var(--font-2xl);
   font-weight: 700;
 }
 
@@ -229,15 +257,18 @@ button {
   color: white;
   border: none;
   padding: 0.75rem 1.5rem;
-  border-radius: 0.5rem;
-  font-size: 1rem;
+  border-radius: 1.5rem; /* 吉卜力風格：藥丸形狀 */
+  font-size: var(--font-base);
   font-weight: 500;
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: all 0.3s ease; /* 更柔和的動畫 */
+  box-shadow: var(--shadow-sm);
 }
 
 .btn-primary:hover {
   background-color: var(--primary-hover);
+  transform: translateY(-2px); /* 吉卜力風格：向上浮起 */
+  box-shadow: var(--shadow-md);
 }
 
 .btn-primary:disabled {
@@ -250,11 +281,11 @@ button {
   color: var(--text-primary);
   border: 1px solid var(--border-color);
   padding: 0.75rem 1.5rem;
-  border-radius: 0.5rem;
-  font-size: 1rem;
+  border-radius: 1.5rem; /* 吉卜力風格：藥丸形狀 */
+  font-size: var(--font-base);
   font-weight: 500;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.3s ease;
 }
 
 .btn-secondary:hover {
@@ -264,12 +295,12 @@ button {
 
 .btn-small {
   padding: 0.5rem 1rem;
-  font-size: 0.875rem;
-  border-radius: 0.375rem;
+  font-size: var(--font-sm);
+  border-radius: 1rem; /* 吉卜力風格：更圓潤 */
   background-color: var(--card-bg);
   border: 1px solid var(--border-color);
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.3s ease;
 }
 
 .btn-small:hover {
@@ -306,8 +337,8 @@ input, select, textarea {
   width: 100%;
   padding: 0.75rem;
   border: 1px solid var(--border-color);
-  border-radius: 0.5rem;
-  font-size: 1rem;
+  border-radius: 0.75rem; /* 吉卜力風格：更圓潤 */
+  font-size: var(--font-base);
   font-family: inherit;
   transition: border-color 0.2s;
 }
@@ -315,7 +346,7 @@ input, select, textarea {
 input:focus, select:focus, textarea:focus {
   outline: none;
   border-color: var(--primary-color);
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  box-shadow: 0 0 0 3px rgba(123, 160, 91, 0.15); /* 吉卜力綠色光暈 */
 }
 
 input:disabled, select:disabled, textarea:disabled {
@@ -331,7 +362,7 @@ input:disabled, select:disabled, textarea:disabled {
   display: block;
   margin-bottom: 0.5rem;
   font-weight: 500;
-  font-size: 0.875rem;
+  font-size: var(--font-sm);
   color: var(--text-secondary);
 }
 
@@ -397,7 +428,7 @@ input:disabled, select:disabled, textarea:disabled {
 
 .modal-content h2, .modal-content h3 {
   margin-bottom: 1.5rem;
-  font-size: 1.25rem;
+  font-size: var(--font-xl);
   font-weight: 700;
 }
 
@@ -410,7 +441,7 @@ input:disabled, select:disabled, textarea:disabled {
 
 .empty-state p {
   margin-bottom: 1rem;
-  font-size: 1.125rem;
+  font-size: var(--font-lg);
 }
 
 /* Error */
@@ -420,7 +451,7 @@ input:disabled, select:disabled, textarea:disabled {
   padding: 0.75rem;
   border-radius: 0.5rem;
   margin-top: 1rem;
-  font-size: 0.875rem;
+  font-size: var(--font-sm);
 }
 
 /* Setup Container */
@@ -435,12 +466,12 @@ input:disabled, select:disabled, textarea:disabled {
 }
 
 .setup-container h1 {
-  font-size: 2.5rem;
+  font-size: var(--font-5xl);
   margin-bottom: 2rem;
 }
 
 .setup-container h2 {
-  font-size: 1.75rem;
+  font-size: var(--font-3xl);
   margin-bottom: 2rem;
 }
 
@@ -459,10 +490,10 @@ input:disabled, select:disabled, textarea:disabled {
 .expense-item {
   background-color: var(--card-bg);
   border: 1px solid var(--border-color);
-  border-radius: 0.75rem;
+  border-radius: 1.5rem; /* 吉卜力風格：更圓潤的卡片 */
   padding: 1.25rem;
   box-shadow: var(--shadow-sm);
-  transition: box-shadow 0.2s;
+  transition: all 0.3s ease;
 }
 
 .expense-item:hover {
@@ -480,15 +511,15 @@ input:disabled, select:disabled, textarea:disabled {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  font-size: 1.125rem;
+  font-size: var(--font-lg);
 }
 
 .category-emoji {
-  font-size: 1.5rem;
+  font-size: var(--category-emoji-font-size);
 }
 
 .expense-amount {
-  font-size: 1.25rem;
+  font-size: var(--expense-amount-font-size);
   font-weight: 700;
   color: var(--primary-color);
 }
@@ -498,7 +529,7 @@ input:disabled, select:disabled, textarea:disabled {
   justify-content: space-between;
   align-items: flex-start;
   margin-bottom: 0.75rem;
-  font-size: 0.875rem;
+  font-size: var(--font-sm);
   color: var(--text-secondary);
 }
 
@@ -509,7 +540,7 @@ input:disabled, select:disabled, textarea:disabled {
 }
 
 .expense-meta {
-  font-size: 0.75rem;
+  font-size: var(--font-xs);
 }
 
 .expense-note {
@@ -517,7 +548,7 @@ input:disabled, select:disabled, textarea:disabled {
   padding: 0.75rem;
   border-radius: 0.5rem;
   margin-bottom: 0.75rem;
-  font-size: 0.875rem;
+  font-size: var(--font-sm);
 }
 
 .expense-actions {
@@ -537,32 +568,34 @@ input:disabled, select:disabled, textarea:disabled {
   background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
   color: white;
   padding: 2rem;
-  border-radius: 0.75rem;
+  border-radius: 1.5rem; /* 吉卜力風格：更圓潤 */
   text-align: center;
+  box-shadow: var(--shadow-md);
 }
 
 .settlement-summary h3 {
-  font-size: 1rem;
+  font-size: var(--font-base);
   font-weight: 500;
   margin-bottom: 0.5rem;
   opacity: 0.9;
 }
 
 .total-amount {
-  font-size: 2.5rem;
+  font-size: var(--settlement-total-font-size);
   font-weight: 700;
 }
 
 .settlements-section {
   background-color: var(--card-bg);
   border: 1px solid var(--border-color);
-  border-radius: 0.75rem;
+  border-radius: 1.5rem; /* 吉卜力風格：更圓潤 */
   padding: 1.5rem;
+  box-shadow: var(--shadow-sm);
 }
 
 .settlements-section h3 {
   margin: 0;
-  font-size: 1.25rem;
+  font-size: var(--font-xl);
 }
 
 .section-header {
@@ -593,7 +626,7 @@ input:disabled, select:disabled, textarea:disabled {
   color: var(--text-secondary);
   border-radius: 0.375rem;
   cursor: pointer;
-  font-size: 0.875rem;
+  font-size: var(--font-sm);
   font-weight: 500;
   transition: all 0.2s;
 }
@@ -611,7 +644,7 @@ input:disabled, select:disabled, textarea:disabled {
   text-align: center;
   padding: 2rem;
   color: var(--success-color);
-  font-size: 1.125rem;
+  font-size: var(--font-lg);
 }
 
 .settlements-list {
@@ -638,11 +671,11 @@ input:disabled, select:disabled, textarea:disabled {
 
 .arrow {
   color: var(--primary-color);
-  font-size: 1.25rem;
+  font-size: var(--font-xl);
 }
 
 .settlement-amount {
-  font-size: 1.125rem;
+  font-size: var(--font-lg);
   font-weight: 700;
   color: var(--primary-color);
 }
@@ -663,13 +696,13 @@ input:disabled, select:disabled, textarea:disabled {
 
 .stat-item span {
   display: block;
-  font-size: 0.875rem;
+  font-size: var(--font-sm);
   color: var(--text-secondary);
   margin-bottom: 0.25rem;
 }
 
 .stat-item strong {
-  font-size: 1.25rem;
+  font-size: var(--font-xl);
   color: var(--text-primary);
 }
 
@@ -719,15 +752,16 @@ input:disabled, select:disabled, textarea:disabled {
 }
 
 .day-date {
-  font-size: 0.75rem;
+  font-size: var(--font-xs);
   opacity: 0.8;
 }
 
 .itinerary-content {
   background-color: var(--card-bg);
   border: 1px solid var(--border-color);
-  border-radius: 0.75rem;
+  border-radius: 1.5rem; /* 吉卜力風格：更圓潤 */
   padding: 1.5rem;
+  box-shadow: var(--shadow-sm);
 }
 
 .itinerary-header {
@@ -738,69 +772,467 @@ input:disabled, select:disabled, textarea:disabled {
 }
 
 .itinerary-header h3 {
-  font-size: 1.25rem;
+  font-size: var(--font-xl);
 }
 
+/* Timeline Layout */
 .itinerary-items {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
-  margin-top: 1rem;
+  gap: 0;
+  margin-top: 1.5rem;
+  position: relative;
+}
+
+/* Timeline vertical line - 吉卜力風格虛線 */
+.itinerary-items::before {
+  content: '';
+  position: absolute;
+  left: var(--timeline-center-x); /* Use CSS variable for timeline center */
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: repeating-linear-gradient(
+    to bottom,
+    var(--primary-color) 0px,
+    var(--primary-color) 8px,
+    transparent 8px,
+    transparent 16px
+  );
+  opacity: 0.3;
 }
 
 .itinerary-item {
-  background-color: var(--bg-color);
+  display: flex;
+  gap: 1rem;
+  padding: 0 0 1.5rem 0;
+  position: relative;
+}
+
+/* Last item - no bottom padding */
+.itinerary-item:last-child {
+  padding-bottom: 0;
+}
+
+/* Timeline dot */
+.timeline-time {
+  flex-shrink: 0;
+  width: 65px;
+  text-align: right;
+  padding-top: 0.25rem;
+  padding-right: 12px;
+  position: relative;
+}
+
+.timeline-time .time-text {
+  font-size: var(--font-sm);
+  font-weight: 600;
+  color: var(--primary-color);
+  display: block;
+  margin-bottom: 0.25rem;
+}
+
+.timeline-time .time-end {
+  font-size: var(--font-xs);
+  color: var(--text-secondary);
+  display: block;
+}
+
+.timeline-dot {
+  position: absolute;
+  right: -8px;
+  top: 6px;
+  width: 14px;  /* 吉卜力風格：稍微大一點 */
+  height: 14px;
+  background-color: var(--card-bg);
+  border: 3px solid var(--primary-color);
+  border-radius: 50%;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);  /* 柔和陰影 */
+  z-index: 1;
+}
+
+/* Timeline card content - 吉卜力風格 */
+.timeline-content {
+  flex: 1;
+  background-color: var(--card-bg);
   border: 1px solid var(--border-color);
-  border-radius: 0.5rem;
+  border-radius: 1.5rem; /* 吉卜力風格：更圓潤 */
   padding: 1rem;
+  box-shadow: var(--shadow-sm);
+  transition: all 0.3s ease;
+}
+
+.timeline-content:hover {
+  box-shadow: var(--shadow-md);
+  border-color: var(--primary-color);
+  transform: translateY(-2px); /* 吉卜力風格：向上浮起 */
 }
 
 .itinerary-item-header {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 0.75rem;
-  margin-bottom: 0.5rem;
-  font-weight: 600;
+  margin-bottom: 0.75rem;
 }
 
-.time-badge {
-  background-color: var(--primary-color);
-  color: white;
-  padding: 0.25rem 0.75rem;
-  border-radius: 1rem;
-  font-size: 0.75rem;
-  font-weight: 500;
+.activity-icon {
+  font-size: 1.5rem;
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+.activity-info {
+  flex: 1;
+}
+
+.activity-title {
+  font-size: var(--font-base);
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 0.25rem;
 }
 
 .itinerary-location {
   color: var(--text-secondary);
-  font-size: 0.875rem;
+  font-size: var(--font-sm);
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
   margin-bottom: 0.5rem;
 }
 
 .itinerary-note {
   color: var(--text-secondary);
-  font-size: 0.875rem;
+  font-size: var(--font-sm);
+  line-height: 1.5;
   margin-bottom: 0.75rem;
   padding: 0.75rem;
-  background-color: var(--card-bg);
-  border-radius: 0.375rem;
+  background-color: var(--bg-color);
+  border-radius: 0.5rem;
+  border-left: 3px solid var(--primary-color);
 }
 
 .itinerary-actions {
   display: flex;
   gap: 0.5rem;
   justify-content: flex-end;
+  padding-top: 0.5rem;
+  border-top: 1px solid var(--border-color);
+}
+
+/* Duration badge */
+.duration-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  background-color: var(--bg-color);
+  color: var(--text-secondary);
+  padding: 0.25rem 0.625rem;
+  border-radius: 1rem;
+  font-size: var(--font-xs);
+  font-weight: 500;
+}
+
+/* Shopping List */
+.shopping-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.participant-tabs {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.5rem;
+}
+
+.participant-tab {
+  padding: 0.75rem 1rem;
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 1.25rem; /* 吉卜力風格：更圓潤 */
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-weight: 500;
+  font-size: var(--font-sm);
+  box-shadow: var(--shadow-sm);
+}
+
+.participant-tab:hover {
+  background-color: var(--bg-color);
+}
+
+.participant-tab.active {
+  background-color: var(--primary-color);
+  color: white;
+  border-color: var(--primary-color);
+}
+
+.item-count {
+  background-color: rgba(255, 255, 255, 0.3);
+  padding: 0.125rem 0.5rem;
+  border-radius: 1rem;
+  font-size: var(--font-xs);
+  font-weight: 600;
+}
+
+.participant-tab.active .item-count {
+  background-color: rgba(255, 255, 255, 0.3);
+}
+
+.shopping-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.shopping-items {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.shopping-item {
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 1.5rem; /* 吉卜力風格：更圓潤 */
+  padding: 1rem;
+  transition: all 0.3s ease;
+  box-shadow: var(--shadow-sm);
+}
+
+.shopping-item.purchased {
+  opacity: 0.6;
+  background-color: var(--bg-color);
+}
+
+.shopping-item-main {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.shopping-checkbox {
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.shopping-item-name {
+  flex: 1;
+  font-size: var(--font-base);
+  font-weight: 500;
+}
+
+.strikethrough {
+  text-decoration: line-through;
+  color: var(--text-secondary);
+}
+
+.taiwan-price {
+  flex-shrink: 0;
+  min-width: 120px;
+}
+
+.price-tag {
+  display: inline-block;
+  background-color: var(--bg-color);
+  color: var(--text-secondary);
+  padding: 0.375rem 0.75rem;
+  border-radius: 0.375rem;
+  font-size: var(--font-sm);
+  font-weight: 500;
+}
+
+.price-placeholder {
+  color: var(--text-secondary);
+  font-size: var(--font-sm);
+  font-style: italic;
+}
+
+.price-input {
+  width: 100px;
+  padding: 0.375rem 0.5rem;
+  font-size: var(--font-sm);
+}
+
+.shopping-actions {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: flex-end;
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--border-color);
+}
+
+/* ========== Transportation Connector ========== */
+/* 整體交通資訊區塊容器 */
+.transportation-connector {
+  display: flex;
+  gap: 1rem;
+  padding: 0.5rem 0;
+  margin-left: 60px;
+  position: relative;
+}
+
+/* 左側虛線區域容器 */
+.transport-line {
+  width: auto;
+  min-width: 12px;
+  height: 100%;
+  min-height: 30px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  padding-right: 0.5rem;
+}
+
+/* 虛線本身（藍色虛線） */
+.transport-line::before {
+  content: '';
+  position: absolute;
+  left: 5px;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: repeating-linear-gradient(
+    to bottom,
+    var(--primary-color) 0px,
+    var(--primary-color) 4px,
+    transparent 4px,
+    transparent 8px
+  );
+}
+
+/* 右側所有交通資訊的容器 */
+.transport-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0.5rem 0;
+  position: relative; /* Positioning context for absolute children */
+}
+
+/* 第一行容器：包含 🗺️ 查看路線 + 🎫 查看票券 */
+.transport-info-row-1 {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  padding-left:0px;
+}
+
+/* 第二行容器：包含 ⏱️ 時間 + 💴 費用 */
+.transport-info-row-2 {
+  display: flex;
+  align-items: center;
+  gap: 2.1rem;
+  flex-wrap: wrap;
+  padding-left:5px;
+}
+
+/* 第三行容器：包含備註文字 */
+.transport-info-row-3 {
+  display: flex;
+  padding-left:5px;
+}
+
+/* 🚇 交通方式 badge（例如：🚇 電車、🚕 計程車、🚌 巴士、🚶 步行、✈️ 飛機）*/
+/* 湖水藍底的交通方式標籤，絕對定位在左側虛線旁 */
+.transport-method {
+  /* Reduced visual weight */
+  font-size: var(--font-xs);     /* Smaller font size */
+  font-weight: 500;              /* Lighter weight */
+  color: var(--primary-color);
+  background-color: rgba(115, 177, 191, 0.15); /* 湖水藍底 */
+  padding: 0.125rem 0.375rem;    /* Reduced padding */
+  border-radius: 0.5rem;         /* Slightly smaller border-radius */
+
+  /* Position based on timeline center variable */
+  position: absolute;
+  right: 215px;
+  top: 0.5rem;
+  z-index: 1;
+  white-space: nowrap;
+}
+
+/* ⏱️ 時間 或 💴 費用 */
+/* 用於顯示 "⏱️ 15分鐘" 或 "💴 ¥200" */
+.transport-detail {
+  font-size: var(--font-xs);
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+/* 📝 備註文字 */
+/* 斜體灰色的備註文字，例如 "JR山手線" */
+.transport-note {
+  font-size: var(--font-xs);
+  color: var(--text-secondary);
+  font-style: italic;
+}
+
+/* 🗺️ 查看路線 按鈕 */
+/* 藍色邊框的連結按鈕，Hover 時變成藍底白字 */
+.transport-maps-link {
+  font-size: var(--font-xs);
+  color: var(--primary-color);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.125rem 0.25rem;
+  background-color: rgba(115, 177, 191, 0.1);
+  border-radius: 1rem;
+  border: 1px solid var(--primary-color);
+  transition: all 0.3s ease;
+  font-weight: 500;
+}
+
+.transport-maps-link:hover {
+  background-color: var(--primary-color);
+  color: white;
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-sm);
+}
+
+/* 🎫 查看票券 按鈕 */
+/* 橘色邊框的連結按鈕，Hover 時變成橘底白字 */
+.transport-ticket-link {
+  font-size: var(--font-xs);
+  color: var(--secondary-color);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.125rem 0.25rem;
+  background-color: rgba(242, 182, 128, 0.1);
+  border-radius: 1rem;
+  border: 1px solid var(--secondary-color);
+  transition: all 0.3s ease;
+  font-weight: 500;
+}
+
+.transport-ticket-link:hover {
+  background-color: var(--secondary-color);
+  color: white;
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-sm);
 }
 
 /* Responsive - iPad and smaller */
 @media (max-width: 768px) {
   .app-main {
     padding: 1rem;
-  }
-
-  .header-top h1 {
-    font-size: 1.25rem;
   }
 
   .settings-row {
@@ -828,10 +1260,6 @@ input:disabled, select:disabled, textarea:disabled {
     align-items: flex-start;
     gap: 0.5rem;
   }
-
-  .total-amount {
-    font-size: 2rem;
-  }
 }
 
 /* iPhone Safe Areas and Optimization */
@@ -857,18 +1285,12 @@ input:disabled, select:disabled, textarea:disabled {
 
 /* iPhone SE (1st gen, 2nd gen, 3rd gen) - 375px width */
 @media (max-width: 428px) {
-  .header-top h1 {
-    font-size: 1.125rem;
-  }
-
   .btn-icon {
-    font-size: 1.25rem;
     padding: 0.375rem;
   }
 
   .tab-button {
     padding: 0.875rem 0.5rem;
-    font-size: 0.875rem;
   }
 
   .app-main {
@@ -880,20 +1302,8 @@ input:disabled, select:disabled, textarea:disabled {
     max-width: calc(100vw - 2rem);
   }
 
-  .expense-title {
-    font-size: 1rem;
-  }
-
-  .expense-amount {
-    font-size: 1.125rem;
-  }
-
   .settlement-summary {
     padding: 1.5rem;
-  }
-
-  .total-amount {
-    font-size: 1.75rem;
   }
 
   .balances-grid,
@@ -904,24 +1314,17 @@ input:disabled, select:disabled, textarea:disabled {
 
   .day-tab {
     padding: 0.625rem 1rem;
-    font-size: 0.875rem;
   }
 
   .btn-primary,
   .btn-secondary {
     padding: 0.625rem 1.25rem;
-    font-size: 0.9375rem;
-  }
-
-  .form-group label {
-    font-size: 0.8125rem;
   }
 
   input,
   select,
   textarea {
     padding: 0.625rem;
-    font-size: 0.9375rem;
   }
 }
 
@@ -931,13 +1334,8 @@ input:disabled, select:disabled, textarea:disabled {
     padding: 0.875rem 1rem;
   }
 
-  .header-top h1 {
-    font-size: 1rem;
-  }
-
   .tab-button {
     padding: 0.75rem 0.375rem;
-    font-size: 0.8125rem;
   }
 
   .app-main {
@@ -952,14 +1350,6 @@ input:disabled, select:disabled, textarea:disabled {
     padding: 1.25rem;
   }
 
-  .total-amount {
-    font-size: 1.5rem;
-  }
-
-  .settlement-summary h3 {
-    font-size: 0.875rem;
-  }
-
   .modal-content {
     padding: 1rem;
   }
@@ -967,22 +1357,12 @@ input:disabled, select:disabled, textarea:disabled {
   .btn-primary,
   .btn-secondary {
     padding: 0.5rem 1rem;
-    font-size: 0.875rem;
   }
 
   input,
   select,
   textarea {
     padding: 0.5rem;
-    font-size: 0.875rem;
-  }
-
-  .setup-container h1 {
-    font-size: 2rem;
-  }
-
-  .setup-container h2 {
-    font-size: 1.5rem;
   }
 }
 
@@ -1008,16 +1388,6 @@ input:disabled, select:disabled, textarea:disabled {
 
   .setup-container {
     padding: 1rem;
-  }
-
-  .setup-container h1 {
-    font-size: 1.75rem;
-    margin-bottom: 1rem;
-  }
-
-  .setup-container h2 {
-    font-size: 1.25rem;
-    margin-bottom: 1rem;
   }
 }
 
@@ -1103,5 +1473,158 @@ input:disabled, select:disabled, textarea:disabled {
   .modal-content,
   .settings-panel {
     -webkit-overflow-scrolling: touch;
+  }
+}
+
+/* Trip Setup - 旅程列表樣式 */
+.trip-setup-actions {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  width: 100%;
+  max-width: 400px;
+}
+
+.trip-setup-actions button {
+  flex: 1;
+}
+
+.recent-trips-section {
+  width: 100%;
+  max-width: 600px;
+}
+
+.recent-trips-section h2 {
+  font-size: var(--font-2xl);
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+  color: var(--text-primary);
+}
+
+.loading-trips {
+  text-align: center;
+  padding: 2rem;
+  color: var(--text-secondary);
+  font-size: var(--font-lg);
+}
+
+.trips-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.trip-card {
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 1.5rem;
+  padding: 1.25rem;
+  transition: all 0.3s ease;
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  position: relative;
+}
+
+.trip-card-clickable {
+  flex: 1;
+  cursor: pointer;
+}
+
+.trip-card:hover {
+  box-shadow: var(--shadow-md);
+  border-color: var(--primary-color);
+  transform: translateY(-2px);
+}
+
+.trip-card:active {
+  transform: translateY(0);
+}
+
+.btn-delete-trip {
+  background-color: transparent;
+  border: 1px solid var(--border-color);
+  border-radius: 0.75rem;
+  padding: 0.5rem 0.75rem;
+  font-size: var(--font-lg);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  flex-shrink: 0;
+}
+
+.btn-delete-trip:hover {
+  background-color: var(--danger-color);
+  border-color: var(--danger-color);
+  transform: scale(1.1);
+}
+
+.btn-delete-trip:active {
+  transform: scale(0.95);
+}
+
+.trip-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.trip-card-header h3 {
+  font-size: var(--font-lg);
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.trip-date {
+  font-size: var(--font-xs);
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.trip-card-info {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  font-size: var(--font-sm);
+  color: var(--text-secondary);
+}
+
+.trip-room-code {
+  font-family: monospace;
+  font-weight: 600;
+  color: var(--primary-color);
+  background-color: rgba(115, 177, 191, 0.1);
+  padding: 0.25rem 0.625rem;
+  border-radius: 0.5rem;
+}
+
+.trip-participants {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+/* Responsive for trip cards */
+@media (max-width: 428px) {
+  .trip-setup-actions {
+    flex-direction: column;
+  }
+
+  .trip-card {
+    padding: 1rem;
+  }
+
+  .trip-card-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .trip-card-info {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
   }
 }

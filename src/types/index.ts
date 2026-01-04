@@ -33,6 +33,16 @@ export interface Expense {
   updatedAt: string;
 }
 
+// 交通方式
+export interface Transportation {
+  method: string; // 交通工具類型：電車、巴士、步行、計程車等
+  duration?: string; // 交通時間，例如: "15分鐘"
+  cost?: number; // 交通費用 (JPY)
+  note?: string; // 額外備註，例如: "JR山手線"
+  mapsLink?: string; // Google Maps 連結
+  ticketLink?: string; // 票券/憑證連結（KKday、Klook、雲端圖片等）
+}
+
 // 行程項目
 export interface ItineraryItem {
   id: string;
@@ -42,6 +52,7 @@ export interface ItineraryItem {
   title: string;
   location?: string;
   note?: string;
+  transportation?: Transportation; // 從上一個地點到這裡的交通方式
   order: number; // 用於排序
   createdAt: string;
   updatedAt: string;
@@ -80,4 +91,16 @@ export interface Settlement {
 export interface ParticipantBalance {
   participantId: string;
   balance: number; // 正數表示應收，負數表示應付
+}
+
+// 購物清單項目
+export interface ShoppingItem {
+  id: string;
+  tripId: string;
+  participantId: string; // 誰要買的
+  itemName: string; // 商品名稱
+  taiwanPrice?: number; // 台灣價格 (TWD)
+  isPurchased: boolean; // 是否已購買
+  createdAt: string;
+  updatedAt: string;
 }
