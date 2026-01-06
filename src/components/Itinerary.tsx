@@ -40,11 +40,9 @@ export default function Itinerary({ tripId }: ItineraryProps) {
   }, [days, selectedDayId]);
 
   const handleAddDay = async (date: string) => {
-    const dayNumber = days.length + 1;
     await addItineraryDay({
       tripId,
       date,
-      dayNumber,
     });
     setShowDayForm(false);
   };
@@ -57,7 +55,12 @@ export default function Itinerary({ tripId }: ItineraryProps) {
     }
   };
 
-  const selectedDay = days.find(d => d.id === selectedDayId);
+  // 按日期排序天數
+  const sortedDays = [...days].sort((a, b) => {
+    return new Date(a.date).getTime() - new Date(b.date).getTime();
+  });
+
+  const selectedDay = sortedDays.find(d => d.id === selectedDayId);
   const dayItems = items
     .filter(item => item.dayId === selectedDayId)
     .sort((a, b) => {
@@ -73,16 +76,13 @@ export default function Itinerary({ tripId }: ItineraryProps) {
   return (
     <div className="itinerary-container">
       <div className="day-tabs">
-        {days.map(day => (
+        {sortedDays.map(day => (
           <button
             key={day.id}
             className={`day-tab ${selectedDayId === day.id ? 'active' : ''}`}
             onClick={() => setSelectedDayId(day.id)}
           >
-            Day {day.dayNumber}
-            <span className="day-date">
-              {new Date(day.date).toLocaleDateString('zh-TW', { month: 'numeric', day: 'numeric' })} ({['日', '一', '二', '三', '四', '五', '六'][new Date(day.date).getDay()]})
-            </span>
+            {new Date(day.date).toLocaleDateString('zh-TW', { month: 'numeric', day: 'numeric' })} ({['日', '一', '二', '三', '四', '五', '六'][new Date(day.date).getDay()]})
           </button>
         ))}
         <button className="day-tab day-tab-add" onClick={() => setShowDayForm(true)}>
@@ -96,7 +96,7 @@ export default function Itinerary({ tripId }: ItineraryProps) {
         <div className="itinerary-content">
           <div className="itinerary-header">
             <h3>
-              Day {selectedDay.dayNumber} - {new Date(selectedDay.date).toLocaleDateString('zh-TW', { month: 'numeric', day: 'numeric' })} ({['日', '一', '二', '三', '四', '五', '六'][new Date(selectedDay.date).getDay()]})
+              {new Date(selectedDay.date).toLocaleDateString('zh-TW', { month: 'numeric', day: 'numeric' })} ({['日', '一', '二', '三', '四', '五', '六'][new Date(selectedDay.date).getDay()]})
             </h3>
             <div style={{ display: 'flex', gap: '0.5rem' }}>
               <button
@@ -175,11 +175,11 @@ function DayForm({ onSubmit, onClose }: { onSubmit: (date: string) => void; onCl
   );
 }
 
-// 產生時間選項 (每半小時)
+// 產生時間選項 (每15分鐘)
 function generateTimeOptions() {
   const options: string[] = [];
   for (let hour = 0; hour < 24; hour++) {
-    for (let minute = 0; minute < 60; minute += 30) {
+    for (let minute = 0; minute < 60; minute += 15) {
       const time = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
       options.push(time);
     }
@@ -232,50 +232,99 @@ function ItemForm({
   const [endTime, setEndTime] = useState(initialTimes.end);
   const [location, setLocation] = useState(item?.location || '');
   const [note, setNote] = useState(item?.note || '');
+  const [ticketLink, setTicketLink] = useState(item?.ticketLink || '');
 
   // 交通方式欄位
   const [transportMethod, setTransportMethod] = useState(item?.transportation?.method || '');
   const [transportDuration, setTransportDuration] = useState(item?.transportation?.duration || '');
   const [transportCost, setTransportCost] = useState(item?.transportation?.cost?.toString() || '');
+  const [transportCostCurrency, setTransportCostCurrency] = useState<'JPY' | 'TWD'>(item?.transportation?.costCurrency || 'JPY');
   const [transportNote, setTransportNote] = useState(item?.transportation?.note || '');
   const [transportMapsLink, setTransportMapsLink] = useState(item?.transportation?.mapsLink || '');
-  const [transportTicketLink, setTransportTicketLink] = useState(item?.transportation?.ticketLink || '');
 
   const timeOptions = generateTimeOptions();
   const durationOptions = generateDurationOptions();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!title.trim()) return;
 
-    // 組合時間範圍
-    const timeRange = (startTime && endTime) ? `${startTime}-${endTime}` : '';
+    // 驗證必填欄位
+    if (!title.trim()) {
+      alert('請輸入項目名稱');
+      return;
+    }
+    if (!startTime) {
+      alert('請選擇開始時間');
+      return;
+    }
 
-    // 組合交通資訊
-    const transportation: Transportation | undefined = transportMethod ? {
-      method: transportMethod,
-      duration: transportDuration || undefined,
-      cost: transportCost ? parseFloat(transportCost) : undefined,
-      note: transportNote || undefined,
-      mapsLink: transportMapsLink || undefined,
-      ticketLink: transportTicketLink || undefined,
-    } : undefined;
+    try {
+      // 組合時間範圍（如果沒有結束時間，就只顯示開始時間）
+      const timeRange = endTime ? `${startTime}-${endTime}` : startTime;
 
-    if (item) {
-      await updateItineraryItem(item.id, { title, timeRange, location, note, transportation });
-    } else {
-      await addItineraryItem({
-        tripId,
-        dayId,
+      // 組合交通資訊
+      let transportation: Transportation | undefined = undefined;
+      if (transportMethod) {
+        transportation = { method: transportMethod };
+
+        // 只加入有值的選填欄位
+        if (transportDuration) {
+          transportation.duration = transportDuration;
+        }
+        if (transportCost) {
+          transportation.cost = parseFloat(transportCost);
+          transportation.costCurrency = transportCostCurrency;
+        }
+        if (transportNote) {
+          transportation.note = transportNote;
+        }
+        if (transportMapsLink) {
+          transportation.mapsLink = transportMapsLink;
+        }
+      }
+
+      // 準備要儲存的資料，只包含有值的選填欄位
+      const dataToSave: any = {
         title,
         timeRange,
-        location,
-        note,
-        transportation,
-        order: nextOrder,
-      });
+      };
+
+      // 只有當 location 有值時才加入
+      if (location.trim()) {
+        dataToSave.location = location;
+      }
+
+      // 只有當 note 有值時才加入
+      if (note.trim()) {
+        dataToSave.note = note;
+      }
+
+      // 只有當 ticketLink 有值時才加入
+      if (ticketLink.trim()) {
+        dataToSave.ticketLink = ticketLink;
+      }
+
+      // 只有當 transportation 有值時才加入
+      if (transportation) {
+        dataToSave.transportation = transportation;
+      }
+
+      if (item) {
+        await updateItineraryItem(item.id, dataToSave);
+      } else {
+        await addItineraryItem({
+          tripId,
+          dayId,
+          ...dataToSave,
+          order: nextOrder,
+        });
+      }
+      onClose();
+    } catch (error) {
+      console.error('儲存失敗，完整錯誤訊息:', error);
+      console.error('錯誤類型:', error instanceof Error ? error.message : '未知錯誤');
+      alert(`儲存失敗：${error instanceof Error ? error.message : '未知錯誤'}\n\n請檢查瀏覽器 Console 查看詳細錯誤訊息`);
     }
-    onClose();
   };
 
   return (
@@ -288,10 +337,10 @@ function ItemForm({
             <input type="text" value={title} onChange={(e) => setTitle(e.target.value)} placeholder="例如：淺草寺參觀" />
           </div>
           <div className="form-group">
-            <label>時間範圍</label>
+            <label>時間 *</label>
             <div className="form-row">
               <div>
-                <label>開始時間</label>
+                <label>開始時間 *</label>
                 <select value={startTime} onChange={(e) => setStartTime(e.target.value)}>
                   <option value="">--:--</option>
                   {timeOptions.map(time => (
@@ -300,7 +349,7 @@ function ItemForm({
                 </select>
               </div>
               <div>
-                <label>結束時間</label>
+                <label>結束時間 (選填)</label>
                 <select value={endTime} onChange={(e) => setEndTime(e.target.value)}>
                   <option value="">--:--</option>
                   {timeOptions.map(time => (
@@ -317,6 +366,15 @@ function ItemForm({
           <div className="form-group">
             <label>備註</label>
             <textarea value={note} onChange={(e) => setNote(e.target.value)} rows={3} />
+          </div>
+          <div className="form-group">
+            <label>票券/憑證連結 (選填)</label>
+            <input
+              type="url"
+              value={ticketLink}
+              onChange={(e) => setTicketLink(e.target.value)}
+              placeholder="例如：KKday訂單、Klook訂單、雲端圖片連結"
+            />
           </div>
 
           {/* 交通方式區塊 */}
@@ -349,13 +407,24 @@ function ItemForm({
                     </select>
                   </div>
                   <div className="form-group">
-                    <label>費用 (JPY, 選填)</label>
-                    <input
-                      type="number"
-                      value={transportCost}
-                      onChange={(e) => setTransportCost(e.target.value)}
-                      placeholder="例如：200"
-                    />
+                    <label>費用 (選填)</label>
+                    <div className="form-row">
+                      <input
+                        type="number"
+                        value={transportCost}
+                        onChange={(e) => setTransportCost(e.target.value)}
+                        placeholder="例如：200"
+                        style={{ flex: 2 }}
+                      />
+                      <select
+                        value={transportCostCurrency}
+                        onChange={(e) => setTransportCostCurrency(e.target.value as 'JPY' | 'TWD')}
+                        style={{ flex: 1 }}
+                      >
+                        <option value="JPY">JPY</option>
+                        <option value="TWD">TWD</option>
+                      </select>
+                    </div>
                   </div>
                 </div>
                 <div className="form-group">
@@ -374,15 +443,6 @@ function ItemForm({
                     value={transportMapsLink}
                     onChange={(e) => setTransportMapsLink(e.target.value)}
                     placeholder="例如：https://maps.app.goo.gl/..."
-                  />
-                </div>
-                <div className="form-group">
-                  <label>票券/憑證連結 (選填)</label>
-                  <input
-                    type="url"
-                    value={transportTicketLink}
-                    onChange={(e) => setTransportTicketLink(e.target.value)}
-                    placeholder="例如：KKday訂單、雲端圖片連結"
                   />
                 </div>
               </>
@@ -424,30 +484,6 @@ function ItineraryItemCard({
 
   const { start, end } = parseTimeRange(item.timeRange);
 
-  // 根據標題猜測活動類型的圖標
-  const getActivityIcon = (title: string, location: string) => {
-    const text = (title + location).toLowerCase();
-
-    if (text.includes('寺') || text.includes('神社') || text.includes('shrine') || text.includes('temple')) return '⛩️';
-    if (text.includes('餐') || text.includes('食') || text.includes('lunch') || text.includes('dinner') || text.includes('breakfast')) return '🍜';
-    if (text.includes('購物') || text.includes('shopping') || text.includes('買')) return '🛍️';
-    if (text.includes('咖啡') || text.includes('cafe') || text.includes('coffee')) return '☕';
-    if (text.includes('公園') || text.includes('park') || text.includes('花')) return '🌸';
-    if (text.includes('博物館') || text.includes('美術館') || text.includes('museum') || text.includes('gallery')) return '🎨';
-    if (text.includes('城') || text.includes('castle')) return '🏯';
-    if (text.includes('塔') || text.includes('tower')) return '🗼';
-    if (text.includes('溫泉') || text.includes('onsen') || text.includes('spa')) return '♨️';
-    if (text.includes('山') || text.includes('mountain') || text.includes('hiking')) return '⛰️';
-    if (text.includes('海') || text.includes('beach') || text.includes('island')) return '🏖️';
-    if (text.includes('飯店') || text.includes('hotel') || text.includes('住宿') || text.includes('check')) return '🏨';
-    if (text.includes('機場') || text.includes('airport') || text.includes('flight')) return '✈️';
-    if (text.includes('車站') || text.includes('station') || text.includes('電車') || text.includes('train')) return '🚄';
-
-    return '📍'; // 預設圖標
-  };
-
-  const activityIcon = getActivityIcon(item.title, item.location || '');
-
   return (
     <>
       {/* 交通資訊區塊 - 顯示在行程項目上方 */}
@@ -458,8 +494,8 @@ function ItineraryItemCard({
             {/* Transport badge - absolutely positioned based on timeline center */}
             <span className="transport-method">{item.transportation.method}</span>
             {/* 第一行：連結 */}
-            <div className="transport-info-row-1">
-              {item.transportation.mapsLink && (
+            {item.transportation.mapsLink && (
+              <div className="transport-info-row-1">
                 <a
                   href={item.transportation.mapsLink}
                   target="_blank"
@@ -469,19 +505,8 @@ function ItineraryItemCard({
                 >
                   🗺️ 查看路線
                 </a>
-              )}
-              {item.transportation.ticketLink && (
-                <a
-                  href={item.transportation.ticketLink}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="transport-ticket-link"
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  🎫 查看票券
-                </a>
-              )}
-            </div>
+              </div>
+            )}
             {/* 第二行：時間 + 費用 */}
             {(item.transportation.duration || item.transportation.cost) && (
               <div className="transport-info-row-2">
@@ -489,7 +514,9 @@ function ItineraryItemCard({
                   <span className="transport-detail">⏱️ {item.transportation.duration}</span>
                 )}
                 {item.transportation.cost && (
-                  <span className="transport-detail">💴 ¥{item.transportation.cost}</span>
+                  <span className="transport-detail">
+                    💴 {item.transportation.costCurrency === 'TWD' ? 'NT$' : '¥'}{item.transportation.cost}
+                  </span>
                 )}
               </div>
             )}
@@ -515,18 +542,31 @@ function ItineraryItemCard({
         {/* 內容卡片 */}
         <div className="timeline-content">
           <div className="itinerary-item-header">
-            <span className="activity-icon">{activityIcon}</span>
             <div className="activity-info">
               <div className="activity-title">{item.title}</div>
               {item.location && (
                 <div className="itinerary-location">
-                  📍 {item.location}
+                  {item.location}
                 </div>
               )}
             </div>
           </div>
 
           {item.note && <div className="itinerary-note">{item.note}</div>}
+
+          {item.ticketLink && (
+            <div style={{ marginTop: '0.5rem' }}>
+              <a
+                href={item.ticketLink}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="transport-ticket-link"
+                onClick={(e) => e.stopPropagation()}
+              >
+                🎫 查看票券
+              </a>
+            </div>
+          )}
 
           {isEditMode && (
             <div className="itinerary-actions">
