@@ -115,14 +115,28 @@ function ShoppingItemCard({
   onToggle: () => void;
   onDelete: () => void;
 }) {
-  const [isEditing, setIsEditing] = useState(false);
+  const [isEditingPrice, setIsEditingPrice] = useState(false);
+  const [isEditingLink, setIsEditingLink] = useState(false);
   const [taiwanPrice, setTaiwanPrice] = useState(item.taiwanPrice?.toString() || '');
+  const [productLink, setProductLink] = useState(item.productLink || '');
 
   const handleSavePrice = async () => {
     await updateShoppingItem(item.id, {
       taiwanPrice: taiwanPrice ? parseFloat(taiwanPrice) : undefined,
     });
-    setIsEditing(false);
+    setIsEditingPrice(false);
+  };
+
+  const handleSaveLink = async () => {
+    const data: any = {};
+    if (productLink.trim()) {
+      data.productLink = productLink.trim();
+    } else {
+      // 如果清空連結，傳遞 null 來刪除欄位
+      data.productLink = null;
+    }
+    await updateShoppingItem(item.id, data);
+    setIsEditingLink(false);
   };
 
   return (
@@ -136,26 +150,51 @@ function ShoppingItemCard({
           className="shopping-checkbox"
         />
 
-        {/* 商品名稱 */}
+        {/* 商品名稱與連結 */}
         <div className="shopping-item-name">
           <span className={item.isPurchased ? 'strikethrough' : ''}>{item.itemName}</span>
-          {item.productLink && (
-            <a
-              href={item.productLink}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="product-link"
-              onClick={(e) => e.stopPropagation()}
-              style={{ marginLeft: '0.5rem', fontSize: 'var(--font-xs)' }}
-            >
-              🔗 商品連結
-            </a>
+          {isEditingLink ? (
+            <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', marginTop: '0.25rem' }}>
+              <input
+                type="url"
+                value={productLink}
+                onChange={(e) => setProductLink(e.target.value)}
+                placeholder="商品連結"
+                style={{ flex: 1, fontSize: 'var(--font-xs)' }}
+                autoFocus
+              />
+              <button className="btn-small" onClick={handleSaveLink}>✓</button>
+              <button className="btn-small" onClick={() => { setProductLink(item.productLink || ''); setIsEditingLink(false); }}>✕</button>
+            </div>
+          ) : (
+            <div style={{ marginTop: '0.25rem' }}>
+              {item.productLink ? (
+                <a
+                  href={item.productLink}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="product-link"
+                  onClick={(e) => e.stopPropagation()}
+                  style={{ fontSize: 'var(--font-xs)' }}
+                >
+                  🔗 商品連結
+                </a>
+              ) : (
+                <span
+                  className="price-placeholder"
+                  onClick={() => !isEditMode && setIsEditingLink(true)}
+                  style={{ cursor: isEditMode ? 'default' : 'pointer', fontSize: 'var(--font-xs)' }}
+                >
+                  + 商品連結
+                </span>
+              )}
+            </div>
           )}
         </div>
 
         {/* 台灣價格 */}
         <div className="taiwan-price">
-          {isEditing ? (
+          {isEditingPrice ? (
             <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
               <input
                 type="number"
@@ -166,10 +205,10 @@ function ShoppingItemCard({
                 autoFocus
               />
               <button className="btn-small" onClick={handleSavePrice}>✓</button>
-              <button className="btn-small" onClick={() => setIsEditing(false)}>✕</button>
+              <button className="btn-small" onClick={() => setIsEditingPrice(false)}>✕</button>
             </div>
           ) : (
-            <div onClick={() => !isEditMode && setIsEditing(true)} style={{ cursor: isEditMode ? 'default' : 'pointer' }}>
+            <div onClick={() => !isEditMode && setIsEditingPrice(true)} style={{ cursor: isEditMode ? 'default' : 'pointer' }}>
               {item.taiwanPrice ? (
                 <span className="price-tag">台灣 NT${item.taiwanPrice}</span>
               ) : (
