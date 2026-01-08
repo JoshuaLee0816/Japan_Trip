@@ -139,6 +139,18 @@ function ShoppingItemCard({
         {/* 商品名稱 */}
         <div className="shopping-item-name">
           <span className={item.isPurchased ? 'strikethrough' : ''}>{item.itemName}</span>
+          {item.productLink && (
+            <a
+              href={item.productLink}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="product-link"
+              onClick={(e) => e.stopPropagation()}
+              style={{ marginLeft: '0.5rem', fontSize: 'var(--font-xs)' }}
+            >
+              🔗 商品連結
+            </a>
+          )}
         </div>
 
         {/* 台灣價格 */}
@@ -189,7 +201,9 @@ function AddItemForm({
   onClose: () => void;
 }) {
   const [itemName, setItemName] = useState('');
+  const [productLink, setProductLink] = useState('');
   const [taiwanPrice, setTaiwanPrice] = useState('');
+  const [includeTaiwanPrice, setIncludeTaiwanPrice] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -199,6 +213,7 @@ function AddItemForm({
       tripId,
       participantId,
       itemName: itemName.trim(),
+      productLink: productLink.trim() || undefined,
       taiwanPrice: taiwanPrice ? parseFloat(taiwanPrice) : undefined,
       isPurchased: false,
     });
@@ -221,15 +236,43 @@ function AddItemForm({
               autoFocus
             />
           </div>
+
           <div className="form-group">
-            <label>台灣價格 (TWD)</label>
+            <label>商品連結 (選填)</label>
             <input
-              type="number"
-              value={taiwanPrice}
-              onChange={(e) => setTaiwanPrice(e.target.value)}
-              placeholder="例如：9500"
+              type="url"
+              value={productLink}
+              onChange={(e) => setProductLink(e.target.value)}
+              placeholder="例如：https://www.amazon.co.jp/..."
             />
           </div>
+
+          <div className="form-group">
+            <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer' }}>
+              <input
+                type="checkbox"
+                checked={includeTaiwanPrice}
+                onChange={(e) => setIncludeTaiwanPrice(e.target.checked)}
+              />
+              <span>比價台灣價格</span>
+            </label>
+          </div>
+
+          {includeTaiwanPrice && (
+            <div className="form-group">
+              <label>台灣價格 (TWD)</label>
+              <input
+                type="text"
+                inputMode="numeric"
+                pattern="[0-9]*"
+                value={taiwanPrice}
+                onChange={(e) => setTaiwanPrice(e.target.value)}
+                placeholder="例如：9500"
+                autoFocus
+              />
+            </div>
+          )}
+
           <div className="button-group">
             <button type="button" className="btn-secondary" onClick={onClose}>取消</button>
             <button type="submit" className="btn-primary">新增</button>
