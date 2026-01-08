@@ -209,15 +209,22 @@ function AddItemForm({
     e.preventDefault();
     if (!itemName.trim()) return;
 
-    await addShoppingItem({
+    const data: any = {
       tripId,
       participantId,
       itemName: itemName.trim(),
-      productLink: productLink.trim() || undefined,
-      taiwanPrice: taiwanPrice ? parseFloat(taiwanPrice) : undefined,
       isPurchased: false,
-    });
+    };
 
+    // 只有當有值時才加入選填欄位
+    if (productLink.trim()) {
+      data.productLink = productLink.trim();
+    }
+    if (taiwanPrice) {
+      data.taiwanPrice = parseFloat(taiwanPrice);
+    }
+
+    await addShoppingItem(data);
     onClose();
   };
 
