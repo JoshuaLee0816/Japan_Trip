@@ -115,30 +115,6 @@ function ShoppingItemCard({
   onToggle: () => void;
   onDelete: () => void;
 }) {
-  const [isEditingPrice, setIsEditingPrice] = useState(false);
-  const [isEditingLink, setIsEditingLink] = useState(false);
-  const [taiwanPrice, setTaiwanPrice] = useState(item.taiwanPrice?.toString() || '');
-  const [productLink, setProductLink] = useState(item.productLink || '');
-
-  const handleSavePrice = async () => {
-    await updateShoppingItem(item.id, {
-      taiwanPrice: taiwanPrice ? parseFloat(taiwanPrice) : undefined,
-    });
-    setIsEditingPrice(false);
-  };
-
-  const handleSaveLink = async () => {
-    const data: any = {};
-    if (productLink.trim()) {
-      data.productLink = productLink.trim();
-    } else {
-      // 如果清空連結，傳遞 null 來刪除欄位
-      data.productLink = null;
-    }
-    await updateShoppingItem(item.id, data);
-    setIsEditingLink(false);
-  };
-
   return (
     <div className={`shopping-item ${item.isPurchased ? 'purchased' : ''}`}>
       <div className="shopping-item-main">
@@ -150,72 +126,9 @@ function ShoppingItemCard({
           className="shopping-checkbox"
         />
 
-        {/* 商品名稱與連結 */}
+        {/* 商品名稱 */}
         <div className="shopping-item-name">
           <span className={item.isPurchased ? 'strikethrough' : ''}>{item.itemName}</span>
-          {isEditingLink ? (
-            <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', marginTop: '0.25rem' }}>
-              <input
-                type="url"
-                value={productLink}
-                onChange={(e) => setProductLink(e.target.value)}
-                placeholder="商品連結"
-                style={{ flex: 1, fontSize: 'var(--font-xs)' }}
-                autoFocus
-              />
-              <button className="btn-small" onClick={handleSaveLink}>✓</button>
-              <button className="btn-small" onClick={() => { setProductLink(item.productLink || ''); setIsEditingLink(false); }}>✕</button>
-            </div>
-          ) : (
-            <div style={{ marginTop: '0.25rem' }}>
-              {item.productLink ? (
-                <a
-                  href={item.productLink}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="product-link"
-                  onClick={(e) => e.stopPropagation()}
-                  style={{ fontSize: 'var(--font-xs)' }}
-                >
-                  🔗 商品連結
-                </a>
-              ) : (
-                <span
-                  className="price-placeholder"
-                  onClick={() => !isEditMode && setIsEditingLink(true)}
-                  style={{ cursor: isEditMode ? 'default' : 'pointer', fontSize: 'var(--font-xs)' }}
-                >
-                  + 商品連結
-                </span>
-              )}
-            </div>
-          )}
-        </div>
-
-        {/* 台灣價格 */}
-        <div className="taiwan-price">
-          {isEditingPrice ? (
-            <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
-              <input
-                type="number"
-                value={taiwanPrice}
-                onChange={(e) => setTaiwanPrice(e.target.value)}
-                placeholder="台灣價格"
-                className="price-input"
-                autoFocus
-              />
-              <button className="btn-small" onClick={handleSavePrice}>✓</button>
-              <button className="btn-small" onClick={() => setIsEditingPrice(false)}>✕</button>
-            </div>
-          ) : (
-            <div onClick={() => !isEditMode && setIsEditingPrice(true)} style={{ cursor: isEditMode ? 'default' : 'pointer' }}>
-              {item.taiwanPrice ? (
-                <span className="price-tag">台灣 NT${item.taiwanPrice}</span>
-              ) : (
-                <span className="price-placeholder">+ 台灣價格</span>
-              )}
-            </div>
-          )}
         </div>
       </div>
 
@@ -240,30 +153,18 @@ function AddItemForm({
   onClose: () => void;
 }) {
   const [itemName, setItemName] = useState('');
-  const [productLink, setProductLink] = useState('');
-  const [taiwanPrice, setTaiwanPrice] = useState('');
-  const [includeTaiwanPrice, setIncludeTaiwanPrice] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!itemName.trim()) return;
 
-    const data: any = {
+    await addShoppingItem({
       tripId,
       participantId,
       itemName: itemName.trim(),
       isPurchased: false,
-    };
+    });
 
-    // 只有當有值時才加入選填欄位
-    if (productLink.trim()) {
-      data.productLink = productLink.trim();
-    }
-    if (taiwanPrice) {
-      data.taiwanPrice = parseFloat(taiwanPrice);
-    }
-
-    await addShoppingItem(data);
     onClose();
   };
 
@@ -282,42 +183,6 @@ function AddItemForm({
               autoFocus
             />
           </div>
-
-          <div className="form-group">
-            <label>商品連結 (選填)</label>
-            <input
-              type="url"
-              value={productLink}
-              onChange={(e) => setProductLink(e.target.value)}
-              placeholder="例如：https://www.amazon.co.jp/..."
-            />
-          </div>
-
-          <div className="form-group">
-            <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer' }}>
-              <input
-                type="checkbox"
-                checked={includeTaiwanPrice}
-                onChange={(e) => setIncludeTaiwanPrice(e.target.checked)}
-              />
-              <span>比價台灣價格</span>
-            </label>
-          </div>
-
-          {includeTaiwanPrice && (
-            <div className="form-group">
-              <label>台灣價格 (TWD)</label>
-              <input
-                type="text"
-                inputMode="numeric"
-                pattern="[0-9]*"
-                value={taiwanPrice}
-                onChange={(e) => setTaiwanPrice(e.target.value)}
-                placeholder="例如：9500"
-                autoFocus
-              />
-            </div>
-          )}
 
           <div className="button-group">
             <button type="button" className="btn-secondary" onClick={onClose}>取消</button>

@@ -99,8 +99,6 @@ export interface ShoppingItem {
   tripId: string;
   participantId: string; // 誰要買的
   itemName: string; // 商品名稱
-  productLink?: string; // 商品連結 (選填)
-  taiwanPrice?: number; // 台灣價格 (TWD)
   isPurchased: boolean; // 是否已購買
   createdAt: string;
   updatedAt: string;
